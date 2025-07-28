@@ -1,9 +1,6 @@
 # SplitMerge for Discord (v1.0.1)
 
 Discordのファイルサイズ制限を超えるファイルを安全に分割・結合するWebアプリケーション
-
-![SplitMerge Screenshot](https://example.com/screenshot.png) <!-- 実際のスクリーンショットURLに置き換えてください -->
-
 ## ✨ 特徴
 
 - **スマートなファイル分割**
