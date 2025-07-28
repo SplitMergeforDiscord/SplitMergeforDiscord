@@ -57,4 +57,4 @@ Discordのファイルサイズ制限を超えるファイルを安全に分割�
 - Safariでは一部機能に制限がある場合があります
 
 ## 📜 ライセンス
-BSD 2-Clause License
+ BSD-2-Clause license
