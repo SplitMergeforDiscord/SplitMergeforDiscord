@@ -1,3 +1,12 @@
+:root {
+    --discord-blurple: #5865f2;
+    --discord-dark: #36393f;
+    --discord-darker: #2f3136;
+    --discord-darkest: #202225;
+    --discord-text: #dcddde;
+    --discord-success: #3ba55c;
+    --discord-danger: #ed4245;
+}
 body {
     font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
     max-width: 800px;
