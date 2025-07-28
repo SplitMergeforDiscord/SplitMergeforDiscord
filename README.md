@@ -47,4 +47,4 @@ Discordのファイルサイズ制限を超えるファイルを分割・結合�
 
 ## ライセンス
 
-MIT License
+BSD 2-Clause License
