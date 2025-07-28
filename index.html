@@ -8,30 +8,28 @@
 </head>
 <body>
     <h1>SplitMerge for Discord</h1>
-
     <div class="tab">
         <button class="tablinks active" onclick="openTab(event, 'splitTab')">ファイル分割</button>
         <button class="tablinks" onclick="openTab(event, 'mergeTab')">ファイル結合</button>
     </div>
-
     <div id="splitTab" class="tabcontent" style="display: block;">
         <div class="container">
             <h2>ファイル分割</h2>
             <input type="file" id="fileToSplit">
-            <div>
+            <div style="margin: 15px 0;">
                 <label for="splitSize">分割サイズ:</label>
                 <select id="splitSize">
                     <option value="10">10MB (無料プラン)</option>
                     <option value="500">500MB (Nitroプラン)</option>
                 </select>
             </div>
-            <div>
+            <div style="margin: 15px 0;">
                 <label for="encryptOption">暗号化:</label>
                 <select id="encryptOption">
                     <option value="none">暗号化しない</option>
                     <option value="aes256">AES-256暗号化</option>
                 </select>
-                <div id="passwordContainer" style="display: none;">
+                <div id="passwordContainer" style="display: none; margin-top: 10px;">
                     <input type="password" id="encryptPassword" placeholder="パスワード">
                     <input type="password" id="encryptPasswordConfirm" placeholder="パスワード(確認)">
                 </div>
@@ -39,7 +37,7 @@
             <button id="splitButton">分割処理を開始</button>
             <div class="progress-container">
                 <div id="splitProgress" class="progress-bar"></div>
-            </div>
+            </div>   
             <div id="splitStatus" class="status"></div>
             <div id="splitResults" style="display: none;">
                 <h3>分割結果:</h3>
@@ -48,28 +46,33 @@
             </div>
         </div>
     </div>
-
     <div id="mergeTab" class="tabcontent">
         <div class="container">
             <h2>ファイル結合</h2>
             <input type="file" id="zipToMerge" accept=".zip">
-            <div id="decryptContainer" style="display: none;">
+            
+            <div id="decryptContainer" style="display: none; margin: 15px 0;">
                 <label for="decryptPassword">復号パスワード:</label>
                 <input type="password" id="decryptPassword" placeholder="パスワード">
             </div>
+            
             <button id="mergeButton">結合処理を開始</button>
+            
             <div class="progress-container">
                 <div id="mergeProgress" class="progress-bar"></div>
             </div>
+            
             <div id="mergeStatus" class="status"></div>
+            
             <div id="mergeResults" style="display: none;">
                 <h3>結合結果:</h3>
-                <div class="preview-area" id="filePreviewContainer"></div>
+                <div class="preview-area">
+                    <div id="filePreviewContainer"></div>
+                </div>
                 <button id="downloadMergedButton">ファイルをダウンロード</button>
             </div>
         </div>
     </div>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="script.js"></script>
 </body>
