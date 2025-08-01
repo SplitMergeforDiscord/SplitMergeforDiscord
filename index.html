@@ -3,77 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SplitMerge for Discord (V1.0.2)</title>
+    <title>SplitMerge for Discord (V1.1.0)</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
-    <h1>SplitMerge for Discord <span class="version-badge">V1.0.2</span></h1>
+    <h1>SplitMerge for Discord <span class="version-badge">V1.1.0</span></h1>
+    
     <div class="tab-container">
-        <button class="tablinks active" onclick="openTab(event, 'splitTab')">ファイル分割</button>
-        <button class="tablinks" onclick="openTab(event, 'mergeTab')">ファイル結合</button>
-    </div>
-    <div id="splitTab" class="tabcontent" style="display: block;">
-        <div class="container">
-            <h2>ファイル分割</h2>
-            <input type="file" id="fileToSplit">
-            <div style="margin: 15px 0;">
-                <label for="splitSize">分割サイズ:</label>
-                <select id="splitSize">
+        <div class="tab-buttons">
+            <button class="tab-button active" data-tab="split"><i class="fas fa-cut feature-icon"></i>ファイル分割</button>
+            <button class="tab-button" data-tab="merge"><i class="fas fa-puzzle-piece feature-icon"></i>ファイル結合</button>
+            <button class="tab-button" data-tab="guide"><i class="fas fa-book feature-icon"></i>解説ページ</button>
+        </div>
+        
+        <!-- 分割タブ -->
+        <div id="split-tab" class="tab-content active">
+            <div class="form-group">
+                <label for="split-file"><i class="fas fa-file-upload"></i> ファイルを選択</label>
+                <input type="file" id="split-file">
+                <div class="supported-formats">対応形式: HTML, CSS, JS, SVG, MIDI, TXT, SQL, XLSX, PPTX, M4A, AVI などすべてのファイル形式</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="split-size"><i class="fas fa-ruler"></i> 分割サイズ</label>
+                <select id="split-size">
                     <option value="10">10MB (無料プラン)</option>
                     <option value="500">500MB (Nitroプラン)</option>
+                    <option value="custom">カスタムサイズ (MB)</option>
                 </select>
+                <div id="custom-size-container" class="hidden" style="margin-top: 10px;">
+                    <input type="number" id="custom-size" min="1" max="500" placeholder="MB単位で入力">
+                </div>
             </div>
-            <div style="margin: 15px 0;">
-                <label for="encryptOption">暗号化:</label>
-                <select id="encryptOption">
+            
+            <div class="form-group">
+                <label for="encryption"><i class="fas fa-lock"></i> 暗号化オプション</label>
+                <select id="encryption">
                     <option value="none">暗号化しない</option>
-                    <option value="aes256">AES-256暗号化</option>
+                    <option value="aes256">AES-256 暗号化</option>
                 </select>
-                <div id="passwordContainer" style="display: none; margin-top: 10px;">
-                    <input type="password" id="encryptPassword" placeholder="パスワード">
-                    <input type="password" id="encryptPasswordConfirm" placeholder="パスワード(確認)">
+                <div id="password-container" class="hidden">
+                    <div style="margin-top: 10px;">
+                        <label for="password"><i class="fas fa-key"></i> パスワード</label>
+                        <input type="password" id="password" placeholder="安全なパスワードを入力">
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <label for="confirm-password"><i class="fas fa-key"></i> パスワード確認</label>
+                        <input type="password" id="confirm-password" placeholder="パスワードを再入力">
+                    </div>
                 </div>
             </div>
-            <button id="splitButton">分割処理を開始</button>
+            
             <div class="progress-container">
-                <div id="splitProgress" class="progress-bar"></div>
-            </div>   
-            <div id="splitStatus" class="status"></div>
-            <div id="splitResults" style="display: none;">
-                <h3>分割結果:</h3>
-                <div id="splitFilesList"></div>
-                <button id="downloadAllButton">すべてダウンロード</button>
+                <div id="split-progress" class="progress-bar"></div>
+            </div>
+            
+            <div id="split-status" class="status info"><i class="fas fa-info-circle"></i> 準備ができました</div>
+            
+            <button id="start-split" disabled><i class="fas fa-play"></i> 分割を開始</button>
+            
+            <div id="split-results" class="hidden">
+                <div class="preview-container">
+                    <h3><i class="fas fa-check-circle"></i> 分割結果</h3>
+                    <div id="split-file-info" class="file-info"></div>
+                </div>
+                
+                <div class="actions">
+                    <button id="download-all" class="pulse"><i class="fas fa-download"></i> すべてダウンロード</button>
+                    <button id="copy-links"><i class="fas fa-copy"></i> Discordリンクをコピー</button>
+                    <button id="reset-split" class="secondary"><i class="fas fa-redo"></i> リセット</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 結合タブ -->
+        <div id="merge-tab" class="tab-content">
+            <div class="form-group">
+                <label for="merge-file"><i class="fas fa-file-archive"></i> 分割ZIPファイルを選択</label>
+                <input type="file" id="merge-file" accept=".zip">
+                <div class="supported-formats">SplitMergeで作成されたZIPファイルを選択してください</div>
+            </div>
+            
+            <div id="decrypt-container" class="hidden">
+                <div class="form-group">
+                    <label for="decrypt-password"><i class="fas fa-unlock"></i> 復号パスワード</label>
+                    <input type="password" id="decrypt-password" placeholder="暗号化時に使用したパスワード">
+                </div>
+            </div>
+            
+            <div class="progress-container">
+                <div id="merge-progress" class="progress-bar"></div>
+            </div>
+            
+            <div id="merge-status" class="status info"><i class="fas fa-info-circle"></i> ZIPファイルを選択してください</div>
+            
+            <button id="start-merge" disabled><i class="fas fa-play"></i> 結合を開始</button>
+            
+            <div id="merge-results" class="hidden">
+                <div class="preview-container">
+                    <div id="preview-content"></div>
+                    <div id="merge-file-info" class="file-info"></div>
+                </div>
+                
+                <div class="actions">
+                    <button id="download-merged" class="pulse"><i class="fas fa-download"></i> ファイルをダウンロード</button>
+                    <button id="reset-merge" class="secondary"><i class="fas fa-redo"></i> リセット</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 解説ページタブ -->
+        <div id="guide-tab" class="tab-content">
+            <div class="guide-section">
+                <h2><i class="fas fa-info-circle feature-icon"></i> SplitMerge for Discordとは？</h2>
+                <p>SplitMergeは、Discordのファイルサイズ制限を克服するためのツールです。大きなファイルを分割してアップロードし、ダウンロード後に再結合できるようにします。</p>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-shield-alt"></i> 安全なファイル転送</h4>
+                    <p>AES-256暗号化とSHA-256ハッシュ検証により、ファイルの安全性と完全性を確保します。パスワード保護も可能です。</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-server"></i> サーバー不要</h4>
+                    <p>すべての処理はブラウザ内で完結するため、サーバーを介さず、ファイルが外部に送信されることはありません。</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4><i class="fas fa-file-alt"></i> 多様なファイル形式対応</h4>
+                    <p>動画、音声、画像、ドキュメント、コードファイルなど、ほぼすべてのファイル形式をサポートしています。</p>
+                </div>
+            </div>
+            
+            <div class="guide-section">
+                <h2><i class="fas fa-cogs feature-icon"></i> 技術仕様</h2>
+                
+                <div class="tech-specs">
+                    <div class="spec-item">
+                        <h4><i class="fas fa-file-archive"></i> ファイル形式</h4>
+                        <p>分割ファイルはZIP形式で保存され、メタデータと分割されたバイナリファイルを含みます。</p>
+                    </div>
+                    
+                    <div class="spec-item">
+                        <h4><i class="fas fa-lock"></i> 暗号化</h4>
+                        <p>AES-256 CBCモードで暗号化され、PBKDF2を使用してパスワードから鍵を導出します。</p>
+                    </div>
+                    
+                    <div class="spec-item">
+                        <h4><i class="fas fa-fingerprint"></i> 整合性検証</h4>
+                        <p>SHA-256ハッシュを使用して、ファイルが改ざんされていないことを確認します。</p>
+                    </div>
+                    
+                    <div class="spec-item">
+                        <h4><i class="fas fa-desktop"></i> クライアント技術</h4>
+                        <p>HTML5 File API, Web Crypto API, JSZipライブラリを使用しています。</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="guide-section">
+                <h2><i class="fas fa-question-circle feature-icon"></i> よくある質問</h2>
+                
+                <div class="faq-item">
+                    <div class="faq-question">Q. ファイルサイズの制限はありますか？</div>
+                    <div class="faq-answer">A. ブラウザのメモリ制限によりますが、通常は数GBまでのファイルを処理できます。非常に大きなファイルの場合は、より小さなサイズに分割することをお勧めします。</div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">Q. 暗号化したファイルのパスワードを忘れた場合は？</div>
+                    <div class="faq-answer">A. パスワードを忘れるとファイルを復元することはできません。パスワードの管理は自己責任でお願いします。</div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">Q. モバイルデバイスでも使えますか？</div>
+                    <div class="faq-answer">A. はい、最新のスマートフォンやタブレットのブラウザでも動作します。ただし、非常に大きなファイルの処理にはデスクトップの使用を推奨します。</div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">Q. 分割ファイルの一部が失われた場合、ファイルを復元できますか？</div>
+                    <div class="faq-answer">A. すべての分割ファイルが必要です。一部でも欠けていると完全な復元はできません。</div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">Q. このツールはオフラインで使えますか？</div>
+                    <div class="faq-answer">A. はい、一度ページを読み込めばインターネット接続なしでも使用できます。ただし、最初の読み込み時とJSZipライブラリのダウンロードには接続が必要です。</div>
+                </div>
+            </div>
+            
+            <div class="guide-section">
+                <h2><i class="fas fa-history feature-icon"></i> バージョン履歴</h2>
+                
+                <h3>V1.1.0 (現在)</h3>
+                <ul>
+                    <li>解説ページを追加</li>
+                    <li>UIデザインの改善</li>
+                    <li>Font Awesomeアイコンの導入</li>
+                    <li>レスポンシブデザインの強化</li>
+                    <li>マイナーなバグ修正</li>
+                </ul>
+                
+                <h3>V1.0.1</h3>
+                <ul>
+                    <li>追加ファイル形式のサポート (SVG, MIDI, SQLなど)</li>
+                    <li>プレビュー機能の改善</li>
+                    <li>進捗表示の精度向上</li>
+                </ul>
+                
+                <h3>V1.0.0</h3>
+                <ul>
+                    <li>初版リリース</li>
+                    <li>基本的分割/結合機能</li>
+                    <li>AES-256暗号化サポート</li>
+                    <li>SHA-256ハッシュ検証</li>
+                </ul>
             </div>
         </div>
     </div>
-    <div id="mergeTab" class="tabcontent">
-        <div class="container">
-            <h2>ファイル結合</h2>
-            <input type="file" id="zipToMerge" accept=".zip">
-            
-            <div id="decryptContainer" style="display: none; margin: 15px 0;">
-                <label for="decryptPassword">復号パスワード:</label>
-                <input type="password" id="decryptPassword" placeholder="パスワード">
-            </div>
-            
-            <button id="mergeButton">結合処理を開始</button>
-            
-            <div class="progress-container">
-                <div id="mergeProgress" class="progress-bar"></div>
-            </div>
-            
-            <div id="mergeStatus" class="status"></div>
-            
-            <div id="mergeResults" style="display: none;">
-                <h3>結合結果:</h3>
-                <div class="preview-area">
-                    <div id="filePreviewContainer"></div>
-                </div>
-                <button id="downloadMergedButton">ファイルをダウンロード</button>
-            </div>
-        </div>
-    </div>
+
+    <!-- JSZipライブラリ -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="script.js"></script>
 </body>
