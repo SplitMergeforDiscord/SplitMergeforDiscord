@@ -2,7 +2,7 @@
 
 Discordのファイルサイズ制限を超えるファイルを安全に分割・結合するWebアプリケーション
 
-![SplitMerge for Discord]([https://i.imgur.com/5Xkz7gP.png](https://github.com/organizations/SplitMergeforDiscord/settings/profile))
+![SplitMerge for Discord]([https://github.com/SplitMergeforDiscord/SplitMergeforDiscord/blob/main/favicon.ico])
 
 ## ✨ 特徴
 
