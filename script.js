@@ -1,5 +1,5 @@
 // バージョン情報
-const VERSION = "1.1.0";
+const VERSION = "1.0.2";
 
 // DOM要素
 const tabButtons = document.querySelectorAll('.tab-button');
