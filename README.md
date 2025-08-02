@@ -1,21 +1,25 @@
-# SplitMerge for Discord (v1.0.2)
+# SplitMerge for Discord (v1.2.0)
 
 Discordのファイルサイズ制限を超えるファイルを安全に分割・結合するWebアプリケーション
-
-![SplitMerge for Discord]([https://github.com/SplitMergeforDiscord/SplitMergeforDiscord/blob/main/favicon.ico])
 
 ## ✨ 特徴
 
 - **スマートなファイル分割**
   - Discord無料プラン向け: 10MB分割
   - Nitroプラン向け: 500MB分割
-  - カスタムサイズ指定可能
+  - カスタムサイズ指定可能 (1MB〜500MB)
 - **軍事級暗号化**
   - AES-256暗号化でファイルを保護
-  - パスワードベースのセキュアな復号
+  - PBKDF2を使用した安全な鍵導出
+  - SHA-256ハッシュによる完全性検証
 - **マルチフォーマット対応**
   - 画像、動画、音声、ドキュメントなど幅広いファイル形式をサポート
-  - 自動プレビュー機能付き
+  - ファイルプレビュー機能 (画像/動画/音声再生)
+  - MIDIファイルの詳細表示と簡易プレイヤー
+- **開発者向け機能**
+  - HTML/CSS/JS仮想テスト環境
+  - CodeMirrorによるコードエディタ
+  - シンタックスハイライト対応
 - **完全クライアントサイド処理**
   - サーバーにファイルをアップロードしない
   - ブラウザ内で完結する安全な設計
@@ -23,6 +27,7 @@ Discordのファイルサイズ制限を超えるファイルを安全に分割�
   - Font Awesomeアイコン統合
   - レスポンシブデザインで全デバイス対応
   - 直感的なタブインターフェース
+  - アニメーション付きプログレスバー
 
 ## 🚀 使い方
 
@@ -45,34 +50,48 @@ Discordのファイルサイズ制限を超えるファイルを安全に分割�
 | カテゴリ       | 対応形式例                          |
 |----------------|-----------------------------------|
 | 画像          | JPG, PNG, GIF, SVG, WEBP, BMP, ICO |
-| 動画          | MP4, WEBM, AVI, MOV, WMV         |
-| 音声          | MP3, WAV, OGG, M4A, MIDI, FLAC   |
-| ドキュメント   | PDF, DOCX, XLSX, PPTX, TXT, SQL  |
-| その他        | ZIP, RAR, 7Z, JSON, HTML, CSS    |
+| 動画          | MP4, WEBM, AVI, MOV, WMV, MPEG    |
+| 音声          | MP3, WAV, OGG, M4A, MIDI, FLAC    |
+| ドキュメント   | PDF, DOCX, XLSX, PPTX, TXT, SQL   |
+| コードファイル | HTML, CSS, JS, JSON, XML          |
+| アーカイブ     | ZIP, RAR, 7Z, TAR, GZ             |
+| その他        | CSV, MDB, REG, LOG, ISO           |
 
 ## ⚙ 技術仕様
 - **フロントエンド**: HTML5, CSS3, JavaScript (ES6)
 - **主要ライブラリ**: 
   - JSZip 3.10.1 (ファイル圧縮/解凍)
-  - Web Crypto API (暗号化/復号)
+  - Web Crypto API (AES-256暗号化/復号)
   - Font Awesome 6.4.0 (アイコン)
+  - CodeMirror (コードエディタ)
+  - Tone.js MIDI (MIDIファイル処理)
+- **暗号化仕様**:
+  - AES-256 CBCモード
+  - PBKDF2鍵導出 (100,000反復)
+  - SHA-256ハッシュ検証
 - **ブラウザサポート**: Chrome, Firefox, Edge, Safariの最新版
 - **レスポンシブデザイン**: スマホ/タブレット/デスクトップ対応
 
 ## ⚠ 注意事項
 - 暗号化パスワードを忘れるとファイルを復元できません
-- 4GB以上の超大容量ファイルはブラウザのメモリ制限に注意
-- Safariでは一部機能に制限がある場合があります
+- ブラウザのメモリ制限により超大容量ファイルは注意が必要
 - 分割ファイルはすべて揃っている必要があります
+- Safariでは一部機能に制限がある場合があります
 
 ## 📜 バージョン履歴
 
-### V1.0.2 (最新)
+### V1.2.0 (最新)
+- HTML/CSS/JSの仮想テスト環境を追加
+- MIDIファイルの詳細表示と簡易プレイヤーを実装
+- コードエディタのシンタックスハイライトを改善
+- パフォーマンス最適化
+- 追加ファイル形式のサポート
+
+### V1.1.0
 - 解説ページを追加
 - UIデザインの改善
 - Font Awesomeアイコンの導入
 - レスポンシブデザインの強化
-- マイナーなバグ修正
 
 ### V1.0.1
 - 追加ファイル形式のサポート (SVG, MIDI, SQLなど)
@@ -89,4 +108,4 @@ Discordのファイルサイズ制限を超えるファイルを安全に分割�
 BSD-2-Clause license
 
 ## 🌐 デモ
-[SplitMerge for Discordを今すぐ使う](https://splitmergefordiscord.github.io/SplitMergeforDiscord/#guide)
+[SplitMerge for Discordを今すぐ使う](https://splitmergefordiscord.github.io/SplitMergeforDiscord/)
