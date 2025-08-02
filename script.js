@@ -1,5 +1,5 @@
 // バージョン情報
-const VERSION = "1.0.2";
+const VERSION = "1.0.3";
 
 // DOM要素
 const tabButtons = document.querySelectorAll('.tab-button');
@@ -377,11 +377,20 @@ startMergeButton.addEventListener('click', async () => {
                    metaData.originalName.endsWith('.sql')) {
             // テキストプレビュー
             const text = await blob.text();
-            const textarea = document.createElement('textarea');
-            textarea.id = 'textPreview';
-            textarea.readOnly = true;
-            textarea.value = text;
-            previewContent.appendChild(textarea);
+            
+            if (metaData.originalName.endsWith('.html') || 
+                metaData.originalName.endsWith('.css') || 
+                metaData.originalName.endsWith('.js')) {
+                // HTML/CSS/JSの場合はコードエディタで表示
+                showCodeEditor(text, metaData.originalName);
+            } else {
+                // 通常のテキスト
+                const textarea = document.createElement('textarea');
+                textarea.id = 'textPreview';
+                textarea.readOnly = true;
+                textarea.value = text;
+                previewContent.appendChild(textarea);
+            }
         } else if (metaData.mimeType === 'image/svg+xml') {
             // SVGプレビュー
             const svgText = await blob.text();
@@ -389,6 +398,10 @@ startMergeButton.addEventListener('click', async () => {
             svgContainer.innerHTML = svgText;
             svgContainer.className = 'svg-preview';
             previewContent.appendChild(svgContainer);
+        } else if (metaData.originalName.endsWith('.mid') || 
+                  metaData.originalName.endsWith('.midi')) {
+            // MIDIファイルのプレビュー
+            await showMidiPreview(combinedData.buffer, metaData.originalName);
         } else {
             // その他のファイルタイプ
             const icon = document.createElement('div');
@@ -412,6 +425,229 @@ startMergeButton.addEventListener('click', async () => {
         showStatus(mergeStatus, `エラーが発生しました: ${error.message}`, 'error');
     }
 });
+
+// MIDIプレビュー表示
+async function showMidiPreview(midiData, filename) {
+    try {
+        // MIDIデータを解析
+        const midi = new Midi(midiData);
+        
+        // 基本情報表示
+        const infoDiv = document.createElement('div');
+        infoDiv.innerHTML = `
+            <h3><i class="fas fa-music"></i> MIDIファイル情報</h3>
+            <p><strong>トラック数:</strong> ${midi.tracks.length}</p>
+            <p><strong>時間形式:</strong> ${midi.header.timeSignatures[0]?.timeSignature || '4/4'}</p>
+            <p><strong>BPM:</strong> ${midi.header.tempos[0]?.bpm || 120}</p>
+            <p><strong>全音符数:</strong> ${midi.tracks.reduce((sum, track) => sum + track.notes.length, 0)}</p>
+        `;
+        previewContent.appendChild(infoDiv);
+        
+        // 簡易プレイヤー
+        const playerDiv = document.createElement('div');
+        playerDiv.className = 'midi-player';
+        playerDiv.innerHTML = `
+            <button id="play-midi"><i class="fas fa-play"></i> 再生</button>
+            <button id="stop-midi"><i class="fas fa-stop"></i> 停止</button>
+            <span id="midi-time">0:00 / ${formatMidiTime(midi.duration)}</span>
+        `;
+        previewContent.appendChild(playerDiv);
+        
+        // ビジュアライザー
+        const visualizer = document.createElement('div');
+        visualizer.className = 'midi-visualizer';
+        previewContent.appendChild(visualizer);
+        
+        // トラックリスト
+        const tracksDiv = document.createElement('div');
+        tracksDiv.innerHTML = '<h4><i class="fas fa-list-ol"></i> トラック一覧</h4>';
+        
+        midi.tracks.forEach((track, i) => {
+            const trackDiv = document.createElement('div');
+            trackDiv.style.margin = '10px 0';
+            trackDiv.style.padding = '10px';
+            trackDiv.style.backgroundColor = 'var(--discord-dark)';
+            trackDiv.style.borderRadius = '5px';
+            trackDiv.innerHTML = `
+                <p><strong>トラック ${i + 1}:</strong> ${track.name || '無名トラック'}</p>
+                <p><small>チャンネル: ${track.channel}</small></p>
+                <p><small>音符数: ${track.notes.length}</small></p>
+            `;
+            tracksDiv.appendChild(trackDiv);
+        });
+        
+        previewContent.appendChild(tracksDiv);
+        
+        // 再生機能 (簡易実装)
+        let currentTime = 0;
+        let animationFrameId;
+        let startTime;
+        let notes = midi.tracks.flatMap(track => track.notes);
+        
+        // 音符をビジュアライザーに表示
+        renderNotes(notes, visualizer, midi.duration);
+        
+        document.getElementById('play-midi').addEventListener('click', () => {
+            startTime = performance.now() - currentTime * 1000;
+            animate();
+        });
+        
+        document.getElementById('stop-midi').addEventListener('click', () => {
+            cancelAnimationFrame(animationFrameId);
+            currentTime = 0;
+            updateVisualizer(notes, visualizer, 0, midi.duration);
+            document.getElementById('midi-time').textContent = `0:00 / ${formatMidiTime(midi.duration)}`;
+        });
+        
+        function animate() {
+            currentTime = (performance.now() - startTime) / 1000;
+            
+            if (currentTime >= midi.duration) {
+                currentTime = midi.duration;
+                cancelAnimationFrame(animationFrameId);
+            } else {
+                animationFrameId = requestAnimationFrame(animate);
+            }
+            
+            updateVisualizer(notes, visualizer, currentTime, midi.duration);
+            document.getElementById('midi-time').textContent = 
+                `${formatMidiTime(currentTime)} / ${formatMidiTime(midi.duration)}`;
+        }
+        
+    } catch (error) {
+        console.error('MIDI解析エラー:', error);
+        previewContent.innerHTML = `
+            <p><i class="fas fa-exclamation-triangle"></i> MIDIファイルの解析に失敗しました</p>
+            <p>${error.message}</p>
+        `;
+    }
+}
+
+function renderNotes(notes, container, duration) {
+    container.innerHTML = '';
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    
+    // ピアノロール表示
+    notes.forEach(note => {
+        const noteElement = document.createElement('div');
+        noteElement.className = 'midi-note';
+        
+        // 位置とサイズを計算
+        const left = (note.time / duration) * width;
+        const noteWidth = (note.duration / duration) * width;
+        const noteHeight = 10;
+        const top = height - (note.midi / 127) * height - noteHeight;
+        
+        noteElement.style.left = `${left}px`;
+        noteElement.style.top = `${top}px`;
+        noteElement.style.width = `${noteWidth}px`;
+        noteElement.style.height = `${noteHeight}px`;
+        noteElement.style.backgroundColor = `hsl(${(note.midi / 127) * 360}, 70%, 50%)`;
+        noteElement.setAttribute('data-time', note.time);
+        noteElement.setAttribute('data-duration', note.duration);
+        
+        container.appendChild(noteElement);
+    });
+}
+
+function updateVisualizer(notes, container, currentTime, duration) {
+    const notesElements = container.querySelectorAll('.midi-note');
+    
+    notesElements.forEach(element => {
+        const noteTime = parseFloat(element.getAttribute('data-time'));
+        const noteDuration = parseFloat(element.getAttribute('data-duration'));
+        
+        if (currentTime >= noteTime && currentTime <= noteTime + noteDuration) {
+            element.classList.add('active-note');
+        } else {
+            element.classList.remove('active-note');
+        }
+    });
+}
+
+function formatMidiTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+// コードエディタ表示
+function showCodeEditor(code, filename) {
+    previewContent.innerHTML = `
+        <div class="editor-toolbar">
+            <button id="run-code"><i class="fas fa-play"></i> 実行</button>
+            <span>${filename}</span>
+        </div>
+        <textarea id="code-editor" class="code-editor">${escapeHtml(code)}</textarea>
+        <div class="editor-preview" id="editor-preview"></div>
+    `;
+    
+    // CodeMirrorエディタを初期化
+    const editorTextarea = document.getElementById('code-editor');
+    let editor;
+    
+    if (filename.endsWith('.html')) {
+        editor = CodeMirror.fromTextArea(editorTextarea, {
+            mode: 'htmlmixed',
+            theme: 'dracula',
+            lineNumbers: true,
+            indentUnit: 4
+        });
+    } else if (filename.endsWith('.css')) {
+        editor = CodeMirror.fromTextArea(editorTextarea, {
+            mode: 'css',
+            theme: 'dracula',
+            lineNumbers: true
+        });
+    } else if (filename.endsWith('.js')) {
+        editor = CodeMirror.fromTextArea(editorTextarea, {
+            mode: 'javascript',
+            theme: 'dracula',
+            lineNumbers: true
+        });
+    } else {
+        editor = CodeMirror.fromTextArea(editorTextarea, {
+            mode: 'text/plain',
+            theme: 'dracula',
+            lineNumbers: true
+        });
+    }
+    
+    // 実行ボタン
+    document.getElementById('run-code').addEventListener('click', () => {
+        const previewFrame = document.getElementById('editor-preview');
+        previewFrame.innerHTML = '';
+        
+        try {
+            const codeToRun = editor.getValue();
+            
+            if (filename.endsWith('.html')) {
+                previewFrame.innerHTML = codeToRun;
+            } else if (filename.endsWith('.js')) {
+                const script = document.createElement('script');
+                script.text = codeToRun;
+                previewFrame.appendChild(script);
+            } else if (filename.endsWith('.css')) {
+                const style = document.createElement('style');
+                style.textContent = codeToRun;
+                previewFrame.appendChild(style);
+                previewFrame.innerHTML += '<p>スタイルが適用されました。HTML要素を追加して確認してください。</p>';
+            }
+        } catch (error) {
+            previewFrame.innerHTML = `<p style="color: red;">エラー: ${error.message}</p>`;
+        }
+    });
+}
+
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
 
 // ユーティリティ関数
 function showStatus(element, message, type) {
