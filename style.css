@@ -322,6 +322,63 @@ button.danger:hover {
     color: var(--discord-text-muted);
 }
 
+/* MIDIプレイヤースタイル */
+.midi-player {
+    width: 100%;
+    margin: 15px 0;
+}
+
+.midi-visualizer {
+    width: 100%;
+    height: 200px;
+    background-color: var(--discord-darkest);
+    border-radius: 6px;
+    margin: 15px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.midi-note {
+    position: absolute;
+    background-color: var(--discord-blurple);
+    border-radius: 3px;
+    transition: left 0.1s linear;
+}
+
+/* コードエディタスタイル */
+.code-editor {
+    width: 100%;
+    height: 400px;
+    border: 1px solid var(--discord-darkest);
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    background-color: var(--discord-dark);
+    color: var(--discord-text);
+    padding: 10px;
+    resize: vertical;
+}
+
+.editor-container {
+    display: none;
+    margin-top: 20px;
+}
+
+.editor-toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.editor-preview {
+    border: 1px solid var(--discord-darkest);
+    border-radius: 6px;
+    padding: 15px;
+    margin-top: 15px;
+    min-height: 200px;
+    background-color: white;
+    color: black;
+}
+
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
     body {
@@ -363,6 +420,12 @@ button.danger:hover {
     animation: pulse 2s infinite;
 }
 
-.hidden {
-    display: none;
+@keyframes noteHighlight {
+    0% { background-color: var(--discord-blurple); }
+    50% { background-color: var(--discord-green); }
+    100% { background-color: var(--discord-blurple); }
+}
+
+.active-note {
+    animation: noteHighlight 0.5s infinite;
 }
