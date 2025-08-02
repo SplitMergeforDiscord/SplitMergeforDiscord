@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SplitMerge for Discord (V1.0.2)</title>
-    <link rel="stylesheet" href="style.css">
+    <title>SplitMerge for Discord (V1.2.0)</title>
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
-    <h1>SplitMerge for Discord <span class="version-badge">V1.0.2</span></h1>
+    <h1>SplitMerge for Discord <span class="version-badge">V1.2.0</span></h1>
     
     <div class="tab-container">
         <div class="tab-buttons">
@@ -194,13 +193,20 @@
             <div class="guide-section">
                 <h2><i class="fas fa-history feature-icon"></i> バージョン履歴</h2>
                 
-                <h3>V1.0.2 (現在)</h3>
+                <h3>V1.2.0 (現在)</h3>
+                <ul>
+                    <li>HTML/CSS/JSの仮想テスト環境を追加</li>
+                    <li>MIDIファイルの詳細表示と簡易プレイヤーを実装</li>
+                    <li>コードエディタのシンタックスハイライトを改善</li>
+                    <li>パフォーマンス最適化</li>
+                </ul>
+                
+                <h3>V1.1.0</h3>
                 <ul>
                     <li>解説ページを追加</li>
                     <li>UIデザインの改善</li>
                     <li>Font Awesomeアイコンの導入</li>
                     <li>レスポンシブデザインの強化</li>
-                    <li>マイナーなバグ修正</li>
                 </ul>
                 
                 <h3>V1.0.1</h3>
@@ -221,8 +227,18 @@
         </div>
     </div>
 
-    <!-- JSZipライブラリ -->
+    <!-- 外部ライブラリ -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.28/dist/Midi.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
+    
+    <!-- メインJavaScriptファイル -->
     <script src="script.js"></script>
 </body>
 </html>
